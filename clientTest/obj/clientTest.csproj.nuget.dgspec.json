@@ -1,0 +1,136 @@
+{
+  "format": 1,
+  "restore": {
+    "/Users/wangql/lworkspace/pinus-unityclient-socket/clientTest/clientTest.csproj": {}
+  },
+  "projects": {
+    "/Users/wangql/lworkspace/pinus-unityclient-socket/clientTest/clientTest.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/wangql/lworkspace/pinus-unityclient-socket/clientTest/clientTest.csproj",
+        "projectName": "clientTest",
+        "projectPath": "/Users/wangql/lworkspace/pinus-unityclient-socket/clientTest/clientTest.csproj",
+        "packagesPath": "/Users/wangql/.nuget/packages/",
+        "outputPath": "/Users/wangql/lworkspace/pinus-unityclient-socket/clientTest/obj/",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "/usr/local/share/dotnet/sdk/NuGetFallbackFolder"
+        ],
+        "configFilePaths": [
+          "/Users/wangql/.config/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "netcoreapp3.1"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netcoreapp3.1": {
+            "projectReferences": {
+              "/Users/wangql/lworkspace/pinus-unityclient-socket/pinus-client/pinus-client.csproj": {
+                "projectPath": "/Users/wangql/lworkspace/pinus-unityclient-socket/pinus-client/pinus-client.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netcoreapp3.1": {
+          "dependencies": {
+            "MSTest.TestAdapter": {
+              "target": "Package",
+              "version": "[2.1.0, )"
+            },
+            "MSTest.TestFramework": {
+              "target": "Package",
+              "version": "[2.1.0, )"
+            },
+            "Microsoft.NET.Test.Sdk": {
+              "target": "Package",
+              "version": "[16.5.0, )"
+            },
+            "coverlet.collector": {
+              "target": "Package",
+              "version": "[1.2.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/3.1.301/RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/wangql/lworkspace/pinus-unityclient-socket/pinus-client/pinus-client.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/wangql/lworkspace/pinus-unityclient-socket/pinus-client/pinus-client.csproj",
+        "projectName": "pinus-client",
+        "projectPath": "/Users/wangql/lworkspace/pinus-unityclient-socket/pinus-client/pinus-client.csproj",
+        "packagesPath": "/Users/wangql/.nuget/packages/",
+        "outputPath": "/Users/wangql/lworkspace/pinus-unityclient-socket/pinus-client/obj/",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "/usr/local/share/dotnet/sdk/NuGetFallbackFolder"
+        ],
+        "configFilePaths": [
+          "/Users/wangql/.config/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "netstandard2.1"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netstandard2.1": {
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netstandard2.1": {
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "NETStandard.Library": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/3.1.301/RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

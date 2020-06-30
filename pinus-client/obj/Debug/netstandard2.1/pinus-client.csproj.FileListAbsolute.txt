@@ -1,0 +1,11 @@
+/Users/wangql/lworkspace/pinus-unityclient-socket/pinus-client/obj/Debug/netstandard2.1/pinus-client.csprojAssemblyReference.cache
+/Users/wangql/lworkspace/pinus-unityclient-socket/pinus-client/obj/Debug/netstandard2.1/pinus-client.AssemblyInfoInputs.cache
+/Users/wangql/lworkspace/pinus-unityclient-socket/pinus-client/obj/Debug/netstandard2.1/pinus-client.AssemblyInfo.cs
+/Users/wangql/lworkspace/pinus-unityclient-socket/pinus-client/obj/Debug/netstandard2.1/pinus-client.csproj.CoreCompileInputs.cache
+/Users/wangql/lworkspace/pinus-unityclient-socket/pinus-client/bin/Debug/netstandard2.1/pinus-client.deps.json
+/Users/wangql/lworkspace/pinus-unityclient-socket/pinus-client/bin/Debug/netstandard2.1/pinus-client.dll
+/Users/wangql/lworkspace/pinus-unityclient-socket/pinus-client/bin/Debug/netstandard2.1/pinus-client.pdb
+/Users/wangql/lworkspace/pinus-unityclient-socket/pinus-client/bin/Debug/netstandard2.1/SimpleJson.dll
+/Users/wangql/lworkspace/pinus-unityclient-socket/pinus-client/obj/Debug/netstandard2.1/pinus-client.csproj.CopyComplete
+/Users/wangql/lworkspace/pinus-unityclient-socket/pinus-client/obj/Debug/netstandard2.1/pinus-client.dll
+/Users/wangql/lworkspace/pinus-unityclient-socket/pinus-client/obj/Debug/netstandard2.1/pinus-client.pdb

@@ -1,0 +1,35 @@
+﻿<Properties StartupConfiguration="{140CA0FF-FE6E-4F25-BD62-ABE3E280A52B}|Unit Tests">
+  <MonoDevelop.Ide.ItemProperties.clientTest PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="pinus-client/src/protobuf/Encoder.cs">
+    <Files>
+      <File FileName="clientTest/UnitTest1.cs" Line="13" Column="58" />
+      <File FileName="pinus-client/src/protobuf/test/ProtobufTest.cs" Line="48" Column="46" />
+      <File FileName="pinus-client/src/protobuf/Encoder.cs" Line="25" Column="30" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="pomelo-dotnetClient" expanded="True">
+            <Node name="clientTest" expanded="True">
+              <Node name="json" expanded="True" />
+            </Node>
+            <Node name="pinus-client" expanded="True">
+              <Node name="src" expanded="True">
+                <Node name="client" expanded="True" />
+                <Node name="protobuf" expanded="True">
+                  <Node name="Encoder.cs" selected="True" />
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MultiItemStartupConfigurations />
+</Properties>
