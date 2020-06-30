@@ -39,7 +39,7 @@ namespace Pomelo.DotNetClient.Test
             var uint32 = "112311";
             byte[] bytes = Pomelo.Protobuf.Encoder.encodeUInt32(uint32);
             var decoded = Pomelo.Protobuf.Decoder.decodeUInt32(bytes);
-            Assert.AreEqual(uint32, decoded);
+            Assert.AreEqual(Convert.ToUInt32(uint32), decoded);
             Assert.IsTrue(CodecTest.EncodeSInt32Test(10000));
             Assert.IsTrue(CodecTest.EncodeUInt32Test(10000));
         }
@@ -58,6 +58,7 @@ namespace Pomelo.DotNetClient.Test
             {
                 JsonObject msg = (JsonObject)msgs[key];
                 byte[] bytes = protobuf.encode(key, msg);
+                Assert.IsNotNull(bytes);
                 JsonObject result = protobuf.decode(key, bytes);
                 Assert.IsNotNull(result);
                 Assert.IsTrue(ProtobufTest.equal(msg, result));

@@ -17,8 +17,8 @@ namespace Pomelo.Protobuf
         {
             if (protos == null) protos = new JsonObject();
 
-            this.protos = protos;
-            this.util = new Util();
+            this.protos = (JsonObject)protos["nested"];
+            util = new Util();
         }
 
         /// <summary>
@@ -32,13 +32,13 @@ namespace Pomelo.Protobuf
         /// </param>
         public JsonObject decode(string route, byte[] buf)
         {
-            this.buffer = buf;
-            this.offset = 0;
-            object proto = null;
-            if (this.protos.TryGetValue(route, out proto))
+            buffer = buf;
+            offset = 0;
+            JsonObject proto = util.GetProtoMessage(protos, route);
+            if (!(proto is null))
             {
                 JsonObject msg = new JsonObject();
-                return this.decodeMsg(msg, (JsonObject)proto, this.buffer.Length);
+                return decodeMsg(msg, proto, buffer.Length);
             }
             return null;
         }
@@ -61,46 +61,50 @@ namespace Pomelo.Protobuf
         /// </param>
         private JsonObject decodeMsg(JsonObject msg, JsonObject proto, int length)
         {
-            while (this.offset < length)
+            while (offset < length)
             {
-                Dictionary<string, int> head = this.getHead();
-                int tag;
-                if (head.TryGetValue("tag", out tag))
+                Dictionary<string, int> head = getHead();
+                int id;
+                if (head.TryGetValue("id", out id))
                 {
-                    object _tags = null;
-                    if (proto.TryGetValue("__tags", out _tags))
+                    object fields = null;
+                    if (proto.TryGetValue("fields", out fields))
                     {
-                        object name;
-                        if (((JsonObject)_tags).TryGetValue(tag.ToString(), out name))
+                        ICollection<string> keys = ((JsonObject)fields).Keys;
+                        foreach (string name in keys)
                         {
-                            object value;
-                            if (proto.TryGetValue(name.ToString(), out value))
+                            object field;
+                            if (((JsonObject)fields).TryGetValue(name, out field))
                             {
-                                object option;
-                                if (((JsonObject)(value)).TryGetValue("option", out option))
+                                object fieldId;
+                                if (((JsonObject)field).TryGetValue("id", out fieldId))
                                 {
-                                    switch (option.ToString())
+                                    if (Convert.ToInt32(fieldId) == id)
                                     {
-                                        case "optional":
-                                        case "required":
-                                            object type;
-                                            if (((JsonObject)(value)).TryGetValue("type", out type))
+                                        object type;
+                                        if (((JsonObject)field).TryGetValue("type", out type))
+                                        {
+                                            object rule;
+                                            if (((JsonObject)field).TryGetValue("rule", out rule))
                                             {
-                                                msg.Add(name.ToString(), this.decodeProp(type.ToString(), proto));
+                                                if (rule.ToString() == "repeated")
+                                                {
+                                                    object msgVal;
+                                                    if (msg.TryGetValue(name.ToString(), out msgVal))
+                                                    {
+                                                        decodeArray((List<object>)msgVal, type.ToString(), proto);
+                                                    }
+                                                    else
+                                                    {
+                                                        msg.Add(name.ToString(), new List<object>());
+                                                    }
+                                                }
                                             }
-                                            break;
-                                        case "repeated":
-                                            object _name;
-                                            if (!msg.TryGetValue(name.ToString(), out _name))
+                                            else
                                             {
-                                                msg.Add(name.ToString(), new List<object>());
+                                                msg.Add(name.ToString(), decodeProp(type.ToString(), proto));
                                             }
-                                            object value_type;
-                                            if (msg.TryGetValue(name.ToString(), out _name) && ((JsonObject)(value)).TryGetValue("type", out value_type))
-                                            {
-                                                decodeArray((List<object>)_name, value_type.ToString(), proto);
-                                            }
-                                            break;
+                                        }
                                     }
                                 }
                             }
@@ -116,17 +120,17 @@ namespace Pomelo.Protobuf
         /// </summary>
         private void decodeArray(List<object> list, string type, JsonObject proto)
         {
-            if (this.util.isSimpleType(type))
+            if (util.isSimpleType(type))
             {
-                int length = (int)Decoder.decodeUInt32(this.getBytes());
+                int length = (int)Decoder.decodeUInt32(getBytes());
                 for (int i = 0; i < length; i++)
                 {
-                    list.Add(this.decodeProp(type, null));
+                    list.Add(decodeProp(type, null));
                 }
             }
             else
             {
-                list.Add(this.decodeProp(type, proto));
+                list.Add(decodeProp(type, proto));
             }
         }
 
@@ -137,19 +141,21 @@ namespace Pomelo.Protobuf
         {
             switch (type)
             {
-                case "uInt32":
-                    return Decoder.decodeUInt32(this.getBytes());
+                case "uint32":
+                    return Decoder.decodeUInt32(getBytes());
                 case "int32":
-                case "sInt32":
-                    return Decoder.decodeSInt32(this.getBytes());
+                case "sint32":
+                    return Decoder.decodeSInt32(getBytes());
                 case "float":
-                    return this.decodeFloat();
+                    return decodeFloat();
                 case "double":
-                    return this.decodeDouble();
+                    return decodeDouble();
                 case "string":
-                    return this.decodeString();
+                    return decodeString();
+                case "bool":
+                    return decodeBool();
                 default:
-                    return this.decodeObject(type, proto);
+                    return decodeObject(type, proto);
             }
         }
 
@@ -158,17 +164,10 @@ namespace Pomelo.Protobuf
         {
             if (proto != null)
             {
-                object __messages;
-                if (proto.TryGetValue("__messages", out __messages))
-                {
-                    object _type;
-                    if (((JsonObject)__messages).TryGetValue(type, out _type) || protos.TryGetValue("message " + type, out _type))
-                    {
-                        int l = (int)Decoder.decodeUInt32(this.getBytes());
-                        JsonObject msg = new JsonObject();
-                        return this.decodeMsg(msg, (JsonObject)_type, this.offset + l);
-                    }
-                }
+                JsonObject subProto = util.GetProtoMessage(proto, type);
+                int l = (int)Decoder.decodeUInt32(getBytes());
+                JsonObject msg = new JsonObject();
+                return decodeMsg(msg, subProto, offset + l);
             }
             return new JsonObject();
         }
@@ -176,39 +175,46 @@ namespace Pomelo.Protobuf
         //Decode string type.
         private string decodeString()
         {
-            int length = (int)Decoder.decodeUInt32(this.getBytes());
-            string msg_string = Encoding.UTF8.GetString(this.buffer, this.offset, length);
-            this.offset += length;
+            int length = (int)Decoder.decodeUInt32(getBytes());
+            string msg_string = Encoding.UTF8.GetString(buffer, offset, length);
+            offset += length;
             return msg_string;
         }
 
         //Decode double type.
         private double decodeDouble()
         {
-            double msg_double = BitConverter.Int64BitsToDouble((long)this.ReadRawLittleEndian64());
-            this.offset += 8;
+            double msg_double = BitConverter.Int64BitsToDouble((long)ReadRawLittleEndian64());
+            offset += 8;
             return msg_double;
         }
 
         //Decode float type
         private float decodeFloat()
         {
-            float msg_float = BitConverter.ToSingle(this.buffer, this.offset);
-            this.offset += 4;
+            float msg_float = BitConverter.ToSingle(buffer, offset);
+            offset += 4;
             return msg_float;
+        }
+
+        private bool decodeBool()
+        {
+            bool res = Convert.ToBoolean(buffer[offset]);
+            offset++;
+            return res;
         }
 
         //Read long in littleEndian
         private ulong ReadRawLittleEndian64()
         {
-            ulong b1 = buffer[this.offset];
-            ulong b2 = buffer[this.offset + 1];
-            ulong b3 = buffer[this.offset + 2];
-            ulong b4 = buffer[this.offset + 3];
-            ulong b5 = buffer[this.offset + 4];
-            ulong b6 = buffer[this.offset + 5];
-            ulong b7 = buffer[this.offset + 6];
-            ulong b8 = buffer[this.offset + 7];
+            ulong b1 = buffer[offset];
+            ulong b2 = buffer[offset + 1];
+            ulong b3 = buffer[offset + 2];
+            ulong b4 = buffer[offset + 3];
+            ulong b5 = buffer[offset + 4];
+            ulong b6 = buffer[offset + 5];
+            ulong b7 = buffer[offset + 6];
+            ulong b8 = buffer[offset + 7];
             return b1 | (b2 << 8) | (b3 << 16) | (b4 << 24)
                   | (b5 << 32) | (b6 << 40) | (b7 << 48) | (b8 << 56);
         }
@@ -216,10 +222,10 @@ namespace Pomelo.Protobuf
         //Get the type and tag.
         private Dictionary<string, int> getHead()
         {
-            int tag = (int)Decoder.decodeUInt32(this.getBytes());
+            int tag = (int)Decoder.decodeUInt32(getBytes());
             Dictionary<string, int> head = new Dictionary<string, int>();
             head.Add("type", tag & 0x7);
-            head.Add("tag", tag >> 3);
+            head.Add("id", tag >> 3);
             return head;
         }
 
@@ -227,15 +233,15 @@ namespace Pomelo.Protobuf
         private byte[] getBytes()
         {
             List<byte> arrayList = new List<byte>();
-            int pos = this.offset;
+            int pos = offset;
             byte b;
             do
             {
-                b = this.buffer[pos];
+                b = buffer[pos];
                 arrayList.Add(b);
                 pos++;
             } while (b >= 128);
-            this.offset = pos;
+            offset = pos;
             int length = arrayList.Count;
             byte[] bytes = new byte[length];
             for (int i = 0; i < length; i++)

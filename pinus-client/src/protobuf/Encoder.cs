@@ -86,6 +86,9 @@ namespace Pomelo.Protobuf
             return System.Text.Encoding.UTF8.GetBytes(msg).Length;
         }
 
-
+        public static byte[] encodeBool(object n)
+        {
+            return new byte[1] { Convert.ToByte(n) };
+        }
     }
 }

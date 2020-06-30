@@ -51,8 +51,8 @@
     },
     "Kar": {
       "fields": {
-        "zaa": {
-          "type": "Bar.Zaa",
+        "like": {
+          "type": "bool",
           "id": 1
         }
       }

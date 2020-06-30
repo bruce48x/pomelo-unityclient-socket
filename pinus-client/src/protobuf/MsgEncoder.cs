@@ -16,7 +16,7 @@ namespace Pomelo.Protobuf
         {
             if (protos == null) protos = new JsonObject();
 
-            this.protos = protos;
+            this.protos = (JsonObject)protos["nested"];
             this.util = new Util();
         }
 
@@ -32,17 +32,13 @@ namespace Pomelo.Protobuf
         public byte[] encode(string route, JsonObject msg)
         {
             byte[] returnByte = null;
-            object proto;
-            if (this.protos.TryGetValue(route, out proto))
+            JsonObject proto = this.util.GetProtoMessage(this.protos,route);
+            if (!(proto is null))
             {
-                if (!checkMsg(msg, (JsonObject)proto))
-                {
-                    return null;
-                }
                 int length = Encoder.byteLength(msg.ToString()) * 2;
                 int offset = 0;
                 byte[] buff = new byte[length];
-                offset = encodeMsg(buff, offset, (JsonObject)proto, msg);
+                offset = encodeMsg(buff, offset, proto, msg);
                 returnByte = new byte[offset];
                 for (int i = 0; i < offset; i++)
                 {
@@ -53,71 +49,6 @@ namespace Pomelo.Protobuf
         }
 
         /// <summary>
-        /// Check the message.
-        /// </summary>
-        private bool checkMsg(JsonObject msg, JsonObject proto)
-        {
-            ICollection<string> protoKeys = proto.Keys;
-            foreach (string key in protoKeys)
-            {
-                JsonObject value = (JsonObject)proto[key];
-                object proto_option;
-                if (value.TryGetValue("option", out proto_option))
-                {
-                    switch (proto_option.ToString())
-                    {
-                        case "required":
-                            if (!msg.ContainsKey(key))
-                            {
-                                return false;
-                            }
-                            else
-                            {
-
-                            }
-                            break;
-                        case "optional":
-                            object value_type;
-
-                            JsonObject messages = (JsonObject)proto["__messages"];
-
-                            value_type = value["type"];
-
-                            if (msg.ContainsKey(key))
-                            {
-                                Object value_proto;
-
-                                if (messages.TryGetValue(value_type.ToString(), out value_proto) || protos.TryGetValue("message " + value_type.ToString(), out value_proto))
-                                {
-                                    checkMsg((JsonObject)msg[key], (JsonObject)value_proto);
-                                }
-                            }
-                            break;
-                        case "repeated":
-                            object msg_name;
-                            object msg_type;
-                            if (value.TryGetValue("type", out value_type) && msg.TryGetValue(key, out msg_name))
-                            {
-                                if (((JsonObject)proto["__messages"]).TryGetValue(value_type.ToString(), out msg_type) || protos.TryGetValue("message " + value_type.ToString(), out msg_type))
-                                {
-                                    List<object> o = (List<object>)msg_name;
-                                    foreach (object item in o)
-                                    {
-                                        if (!checkMsg((JsonObject)item, (JsonObject)msg_type))
-                                        {
-                                            return false;
-                                        }
-                                    }
-                                }
-                            }
-                            break;
-                    }
-                }
-            }
-            return true;
-        }
-
-        /// <summary>
         /// Encode the message.
         /// </summary>
         private int encodeMsg(byte[] buffer, int offset, JsonObject proto, JsonObject msg)
@@ -125,36 +56,34 @@ namespace Pomelo.Protobuf
             ICollection<string> msgKeys = msg.Keys;
             foreach (string key in msgKeys)
             {
-                object value;
-                if (proto.TryGetValue(key, out value))
+                JsonObject protoField = this.util.GetField(proto, key);
+                if (protoField is null)
                 {
-                    object value_option;
-                    if (((JsonObject)value).TryGetValue("option", out value_option))
+                    continue;
+                }
+                object fieldRule;
+                if (protoField.TryGetValue("rule", out fieldRule))
+                {
+                    if (fieldRule.ToString() == "repeated")
                     {
-                        switch (value_option.ToString())
+                        object arr;
+                        if (msg.TryGetValue(key, out arr))
                         {
-                            case "required":
-                            case "optional":
-                                object value_type, value_tag;
-                                if (((JsonObject)value).TryGetValue("type", out value_type) && ((JsonObject)value).TryGetValue("tag", out value_tag))
-                                {
-                                    offset = this.writeBytes(buffer, offset, this.encodeTag(value_type.ToString(), Convert.ToInt32(value_tag)));
-                                    offset = this.encodeProp(msg[key], value_type.ToString(), offset, buffer, proto);
-                                }
-                                break;
-                            case "repeated":
-                                object msg_key;
-                                if (msg.TryGetValue(key, out msg_key))
-                                {
-                                    if (((List<object>)msg_key).Count > 0)
-                                    {
-                                        offset = encodeArray((List<object>)msg_key, (JsonObject)value, offset, buffer, proto);
-                                    }
-                                }
-                                break;
+                            if (((List<object>)arr).Count > 0)
+                            {
+                                offset = encodeArray((List<object>)arr, protoField, offset, buffer, proto);
+                            }
                         }
                     }
-
+                }
+                else
+                {
+                    object valueType, valueId;
+                    if (protoField.TryGetValue("type", out valueType) && protoField.TryGetValue("id", out valueId))
+                    {
+                        offset = this.writeBytes(buffer, offset, this.encodeTag(valueType.ToString(), Convert.ToInt32(valueId)));
+                        offset = this.encodeProp(msg[key], valueType.ToString(), offset, buffer, proto);
+                    }
                 }
             }
             return offset;
@@ -165,24 +94,24 @@ namespace Pomelo.Protobuf
         /// </summary>
         private int encodeArray(List<object> msg, JsonObject value, int offset, byte[] buffer, JsonObject proto)
         {
-            object value_type, value_tag;
-            if (value.TryGetValue("type", out value_type) && value.TryGetValue("tag", out value_tag))
+            object valueType, valueId;
+            if (value.TryGetValue("type", out valueType) && value.TryGetValue("id", out valueId))
             {
-                if (this.util.isSimpleType(value_type.ToString()))
+                if (this.util.isSimpleType(valueType.ToString()))
                 {
-                    offset = this.writeBytes(buffer, offset, this.encodeTag(value_type.ToString(), Convert.ToInt32(value_tag)));
+                    offset = this.writeBytes(buffer, offset, this.encodeTag(valueType.ToString(), Convert.ToInt32(valueId)));
                     offset = this.writeBytes(buffer, offset, Encoder.encodeUInt32((uint)msg.Count));
                     foreach (object item in msg)
                     {
-                        offset = this.encodeProp(item, value_type.ToString(), offset, buffer, null);
+                        offset = this.encodeProp(item, valueType.ToString(), offset, buffer, null);
                     }
                 }
                 else
                 {
                     foreach (object item in msg)
                     {
-                        offset = this.writeBytes(buffer, offset, this.encodeTag(value_type.ToString(), Convert.ToInt32(value_tag)));
-                        offset = this.encodeProp(item, value_type.ToString(), offset, buffer, proto);
+                        offset = this.writeBytes(buffer, offset, this.encodeTag(valueType.ToString(), Convert.ToInt32(valueId)));
+                        offset = this.encodeProp(item, valueType.ToString(), offset, buffer, proto);
                     }
                 }
             }
@@ -196,11 +125,11 @@ namespace Pomelo.Protobuf
         {
             switch (type)
             {
-                case "uInt32":
+                case "uint32":
                     this.writeUInt32(buffer, ref offset, value);
                     break;
                 case "int32":
-                case "sInt32":
+                case "sint32":
                     this.writeInt32(buffer, ref offset, value);
                     break;
                 case "float":
@@ -212,23 +141,21 @@ namespace Pomelo.Protobuf
                 case "string":
                     this.writeString(buffer, ref offset, value);
                     break;
+                case "bool":
+                    this.writeBool(buffer, ref offset, value);
+                    break;
                 default:
-                    object __messages;
-                    object __message_type;
-
-                    if (proto.TryGetValue("__messages", out __messages))
+                    JsonObject message = this.util.GetProtoMessage(this.protos, type);
+                    if (!(message is null))
                     {
-                        if (((JsonObject)__messages).TryGetValue(type, out __message_type) || protos.TryGetValue("message " + type, out __message_type))
+                        byte[] tembuff = new byte[Encoder.byteLength(value.ToString()) * 3];
+                        int length = 0;
+                        length = this.encodeMsg(tembuff, length, message, (JsonObject)value);
+                        offset = writeBytes(buffer, offset, Encoder.encodeUInt32((uint)length));
+                        for (int i = 0; i < length; i++)
                         {
-                            byte[] tembuff = new byte[Encoder.byteLength(value.ToString()) * 3];
-                            int length = 0;
-                            length = this.encodeMsg(tembuff, length, (JsonObject)__message_type, (JsonObject)value);
-                            offset = writeBytes(buffer, offset, Encoder.encodeUInt32((uint)length));
-                            for (int i = 0; i < length; i++)
-                            {
-                                buffer[offset] = tembuff[i];
-                                offset++;
-                            }
+                            buffer[offset] = tembuff[i];
+                            offset++;
                         }
                     }
                     break;
@@ -258,6 +185,11 @@ namespace Pomelo.Protobuf
         {
             this.writeBytes(buffer, offset, Encoder.encodeFloat(float.Parse(value.ToString())));
             offset += 4;
+        }
+
+        private void writeBool(byte[] buffer, ref int offset, object value)
+        {
+            offset = writeBytes(buffer, offset, Encoder.encodeBool(value));
         }
 
         ////Encode UInt32.

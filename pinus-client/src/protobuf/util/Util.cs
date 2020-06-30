@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using SimpleJson;
 
 namespace Pomelo.Protobuf
 {
@@ -13,7 +14,7 @@ namespace Pomelo.Protobuf
         public Util()
         {
             this.initTypeMap();
-            this.types = new string[] { "uint32", "sint32", "int32", "uint64", "sint64", "int64", "float", "double" };
+            this.types = new string[] { "uint32", "sint32", "int32", "uint64", "sint64", "int64", "float", "double", "bool" };
         }
 
         /// <summary>
@@ -63,13 +64,14 @@ namespace Pomelo.Protobuf
         private void initTypeMap()
         {
             Dictionary<string, int> dic = new Dictionary<string, int>();
-            dic.Add("uInt32", 0);
-            dic.Add("sInt32", 0);
+            dic.Add("uint32", 0);
+            dic.Add("sint32", 0);
             dic.Add("int32", 0);
             dic.Add("double", 1);
             dic.Add("string", 2);
             dic.Add("float", 5);
             dic.Add("message", 2);
+            dic.Add("bool", 0);
 
             this.typeMap = dic;
         }
@@ -86,6 +88,43 @@ namespace Pomelo.Protobuf
                 bytes[first] = bytes[last];
                 bytes[last] = temp;
             }
+        }
+
+        public JsonObject GetProtoMessage(JsonObject proto, string name)
+        {
+            if (proto is null)
+            {
+                return null;
+            }
+
+            object obj;
+            if (proto.TryGetValue(name, out obj))
+            {
+                return (JsonObject)obj;
+            }
+            else
+            {
+                object nested;
+                if (proto.TryGetValue("nested", out nested))
+                {
+                    return GetProtoMessage((JsonObject)nested, name);
+                }
+            }
+            return null;
+        }
+
+        public JsonObject GetField(JsonObject proto, string fieldName)
+        {
+            object protoFields;
+            if (proto.TryGetValue("fields", out protoFields))
+            {
+                object protoField;
+                if (((JsonObject)protoFields).TryGetValue(fieldName, out protoField))
+                {
+                    return (JsonObject)protoField;
+                }
+            }
+            return null;
         }
     }
 }

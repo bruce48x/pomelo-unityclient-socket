@@ -1,0 +1,42 @@
+{
+  "Foo": {
+    "query": "xxx",
+    "page": {
+      "age":  10
+    },
+    "count": 160
+  },
+  "Bar": {
+    "foo": [
+      {
+        "query": "foo1",
+        "page": {
+          "age": 1
+        },
+        "count": 3
+      },
+      {
+        "query": "foo2",
+        "page": {
+          "age": 2,
+        },
+        "count": 3
+      },
+      {
+        "query": "foo3",
+        "page": {
+          "age": 3
+        },
+        "count": 3
+      }
+    ],
+    "zaa": {
+      "age":  99
+    }
+  },
+  "Kar": {
+    "zaa": {
+      "age":  8
+    }
+  }
+}
