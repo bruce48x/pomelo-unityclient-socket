@@ -1,10 +1,20 @@
 ﻿<Properties StartupConfiguration="{140CA0FF-FE6E-4F25-BD62-ABE3E280A52B}|Unit Tests">
   <MonoDevelop.Ide.ItemProperties.clientTest PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="pinus-client/src/protobuf/Encoder.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="clientTest/clientTest.cs">
     <Files>
-      <File FileName="clientTest/UnitTest1.cs" Line="13" Column="58" />
-      <File FileName="pinus-client/src/protobuf/test/ProtobufTest.cs" Line="48" Column="46" />
-      <File FileName="pinus-client/src/protobuf/Encoder.cs" Line="25" Column="30" />
+      <File FileName="pinus-client/src/protobuf/Encoder.cs" Line="27" Column="52" />
+      <File FileName="pinus-client/src/transport/Transporter.cs" />
+      <File FileName="pinus-client/src/protobuf/Protobuf.cs" />
+      <File FileName="pinus-client/src/protobuf/MsgEncoder.cs" />
+      <File FileName="pinus-client/src/protobuf/util/Util.cs" Line="17" Column="10" />
+      <File FileName="pinus-client/src/protobuf/Decoder.cs" Line="1" Column="1" />
+      <File FileName="pinus-client/src/protobuf/MsgDecoder.cs" Line="1" Column="1" />
+      <File FileName="clientTest/json/rootProtos.json" Line="61" Column="2" />
+      <File FileName="clientTest/json/rootMsg.json" Line="34" Column="17" />
+      <File FileName="clientTest/test/CodecTest.cs" Line="1" Column="1" />
+      <File FileName="clientTest/test/ProtobufTest.cs" Line="44" Column="1" />
+      <File FileName="clientTest/test/TransportTest.cs" Line="1" Column="1" />
+      <File FileName="clientTest/clientTest.cs" Line="19" Column="36" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -12,17 +22,21 @@
           <Node name="pomelo-dotnetClient" expanded="True">
             <Node name="clientTest" expanded="True">
               <Node name="json" expanded="True" />
+              <Node name="test" expanded="True" />
+              <Node name="clientTest.cs" selected="True" />
             </Node>
             <Node name="pinus-client" expanded="True">
               <Node name="src" expanded="True">
-                <Node name="client" expanded="True" />
                 <Node name="protobuf" expanded="True">
-                  <Node name="Encoder.cs" selected="True" />
+                  <Node name="util" expanded="True" />
                 </Node>
               </Node>
             </Node>
           </Node>
         </State>
+      </Pad>
+      <Pad Id="MonoDevelop.Debugger.WatchPad">
+        <State />
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>

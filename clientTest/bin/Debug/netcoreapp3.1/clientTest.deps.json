@@ -12,7 +12,8 @@
           "MSTest.TestFramework": "2.1.0",
           "Microsoft.NET.Test.Sdk": "16.5.0",
           "coverlet.collector": "1.2.0",
-          "pinus-client": "1.0.0"
+          "pinus-client": "1.0.0",
+          "SimpleJson": "0.1.0.0"
         },
         "runtime": {
           "clientTest.dll": {}

@@ -13,7 +13,7 @@ namespace Pomelo.Protobuf
         public Util()
         {
             this.initTypeMap();
-            this.types = new string[] { "uInt32", "sInt32", "int32", "uInt64", "sInt64", "float", "double" };
+            this.types = new string[] { "uint32", "sint32", "int32", "uint64", "sint64", "int64", "float", "double" };
         }
 
         /// <summary>

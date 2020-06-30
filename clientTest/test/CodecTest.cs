@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using Pomelo.Protobuf;
 
-namespace Pomelo.Protobuf.Test
+namespace Pomelo.DotNetClient.Test
 {
     public class CodecTest
     {
@@ -35,26 +35,6 @@ namespace Pomelo.Protobuf.Test
             }
 
             return true;
-        }
-
-        public static bool Run()
-        {
-            bool success = true, flag = false;
-            DateTime start, end;
-
-            start = DateTime.Now;
-            flag = EncodeSInt32Test(10000);
-            end = DateTime.Now;
-            Console.WriteLine("Encode sint32 test finished , result is : {1}, cost time : {0}", end - start, flag);
-            if (!flag) success = false;
-
-            start = DateTime.Now;
-            flag = EncodeUInt32Test(10000);
-            end = DateTime.Now;
-            Console.WriteLine("Encode uint32 test finished , result is : {1}, cost time : {0}", end - start, flag);
-            if (!flag) success = false;
-
-            return success;
         }
     }
 }

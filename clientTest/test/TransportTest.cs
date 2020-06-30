@@ -56,37 +56,6 @@ namespace Pomelo.DotNetClient.Test
             return result;
         }
 
-        public static void Run()
-        {
-            int num = 10;
-            int limit = 1000;
-
-            Transporter tc = new Transporter(null, process);
-
-            List<byte[]> list;
-
-            byte[] buffer = generateBuffers(num, out list);
-
-            int offset = 0;
-            while (offset < buffer.Length)
-            {
-                int length = 200;
-                length = (offset + length) > buffer.Length ? buffer.Length - offset : length;
-
-                tc.processBytes(buffer, offset, offset + length);
-                offset += length;
-            }
-
-            if (!check(list))
-            {
-                Console.WriteLine("Transport test failed!");
-            }
-            else
-            {
-                Console.WriteLine("Transport test success!");
-            }
-        }
-
         public static void process(byte[] bytes)
         {
             result.Add(bytes);

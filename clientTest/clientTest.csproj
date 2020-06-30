@@ -16,4 +16,12 @@
   <ItemGroup>
     <ProjectReference Include="..\pinus-client\pinus-client.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="test\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="SimpleJson">
+      <HintPath>..\lib\SimpleJson.dll</HintPath>
+    </Reference>
+  </ItemGroup>
 </Project>

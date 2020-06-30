@@ -118,7 +118,7 @@ namespace Pomelo.DotNetClient
             }
         }
 
-        internal void processBytes(byte[] bytes, int offset, int limit)
+        public void processBytes(byte[] bytes, int offset, int limit)
         {
             if (this.transportState == TransportState.readHead)
             {
