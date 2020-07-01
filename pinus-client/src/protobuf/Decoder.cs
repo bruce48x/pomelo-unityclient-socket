@@ -71,7 +71,7 @@ namespace Pomelo.Protobuf
             ulong n = decodeUInt64(bytes);
             long flag = ((n % 2) == 1) ? -1 : 1;
 
-            long result = Convert.ToInt64(Convert.ToInt64((n % 2 + n) / 2) * flag);
+            long result = Convert.ToInt64((n % 2 + n) / 2) * flag;
             return result;
         }
     }

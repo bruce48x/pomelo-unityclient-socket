@@ -38,9 +38,10 @@ namespace Pomelo.Protobuf
 
         public static byte[] encodeSInt32(int n)
         {
-            int num = (int)(n < 0 ? (Math.Abs(n) * 2 - 1) : n * 2);
-            //int num = Convert.ToInt32((n << 1) ^ (n >> 31));
-            return encodeSInt32(num);
+            //uint num = (uint)(n < 0 ? (Math.Abs(n) * 2 - 1) : n * 2);
+            var bArr = BitConverter.GetBytes((n << 1) ^ (n >> 31));
+            uint num = BitConverter.ToUInt32(bArr);
+            return encodeUInt32(num);
         }
 
         public static byte[] encodeSInt64(string n)
@@ -74,7 +75,8 @@ namespace Pomelo.Protobuf
         public static byte[] encodeSInt64(long n)
         {
             //ulong num = (ulong)(n < 0 ? (Math.Abs(n) * 2 - 1) : n * 2);
-            ulong num = Convert.ToUInt64((n << 1) ^ (n >> 63));
+            var bArr = BitConverter.GetBytes((n << 1) ^ (n >> 63));
+            ulong num = BitConverter.ToUInt64(bArr);
             return encodeUInt64(num);
         }
 
