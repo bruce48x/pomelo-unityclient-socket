@@ -54,6 +54,42 @@
         "like": {
           "type": "bool",
           "id": 1
+        },
+        "fl": {
+          "type": "float",
+          "id": 2
+        },
+        "dbl": {
+          "type": "double",
+          "id": 3
+        },
+        "i32": {
+          "type": "int32",
+          "id": 4
+        },
+        "i64": {
+          "type": "int64",
+          "id": 5
+        },
+        "ui32": {
+          "type": "uint32",
+          "id": 6
+        },
+        "ui64": {
+          "type": "uint64",
+          "id": 7
+        },
+        "si32": {
+          "type": "sint32",
+          "id": 8
+        },
+        "si64": {
+          "type": "sint64",
+          "id": 9
+        },
+        "str": {
+          "type": "string",
+          "id": 10
         }
       }
     }

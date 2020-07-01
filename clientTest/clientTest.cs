@@ -58,8 +58,10 @@ namespace Pomelo.DotNetClient.Test
             {
                 JsonObject msg = (JsonObject)msgs[key];
                 byte[] bytes = protobuf.encode(key, msg);
+                Console.WriteLine("bytes" + bytes);
                 Assert.IsNotNull(bytes);
                 JsonObject result = protobuf.decode(key, bytes);
+                Console.WriteLine("result =" + result);
                 Assert.IsNotNull(result);
                 Assert.IsTrue(ProtobufTest.equal(msg, result));
             }

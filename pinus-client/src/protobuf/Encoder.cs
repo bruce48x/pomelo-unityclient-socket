@@ -13,15 +13,6 @@ namespace Pomelo.Protobuf
             return encodeUInt32(Convert.ToUInt32(n));
         }
 
-        /// <summary>
-        /// Encode the UInt32.
-        /// </summary>
-        /// <returns>
-        /// byte[]
-        /// </returns>
-        /// <param name='n'>
-        /// int
-        /// </param>
         public static byte[] encodeUInt32(uint n)
         {
             List<byte> byteList = new List<byte>();
@@ -40,36 +31,53 @@ namespace Pomelo.Protobuf
             return byteList.ToArray();
         }
 
-        //Encode SInt32
         public static byte[] encodeSInt32(string n)
         {
             return encodeSInt32(Convert.ToInt32(n));
         }
 
-        /// <summary>
-        /// Encodes the SInt32.
-        /// </summary>
-        /// <returns>
-        /// byte []
-        /// </returns>
-        /// <param name='n'>
-        /// int
-        /// </param>
         public static byte[] encodeSInt32(int n)
         {
-            UInt32 num = (uint)(n < 0 ? (Math.Abs(n) * 2 - 1) : n * 2);
-            return encodeUInt32(num);
+            int num = (int)(n < 0 ? (Math.Abs(n) * 2 - 1) : n * 2);
+            //int num = Convert.ToInt32((n << 1) ^ (n >> 31));
+            return encodeSInt32(num);
         }
 
-        /// <summary>
-        /// Encodes the float.
-        /// </summary>
-        /// <returns>
-        /// byte []
-        /// </returns>
-        /// <param name='n'>
-        /// float.
-        /// </param>
+        public static byte[] encodeSInt64(string n)
+        {
+            return encodeSInt64(Convert.ToInt64(n));
+        }
+
+        public static byte[] encodeUInt64(string n)
+        {
+            return encodeUInt64(Convert.ToUInt64(n));
+        }
+
+        public static byte[] encodeUInt64(ulong n)
+        {
+            List<byte> byteList = new List<byte>();
+            do
+            {
+                ulong tmp = n % 128;
+                ulong next = n >> 7;
+                if (next != 0)
+                {
+                    tmp = tmp + 128;
+                }
+                byteList.Add(Convert.ToByte(tmp));
+                n = next;
+            } while (n != 0);
+
+            return byteList.ToArray();
+        }       
+
+        public static byte[] encodeSInt64(long n)
+        {
+            //ulong num = (ulong)(n < 0 ? (Math.Abs(n) * 2 - 1) : n * 2);
+            ulong num = Convert.ToUInt64((n << 1) ^ (n >> 63));
+            return encodeUInt64(num);
+        }
+
         public static byte[] encodeFloat(float n)
         {
             byte[] bytes = BitConverter.GetBytes(n);

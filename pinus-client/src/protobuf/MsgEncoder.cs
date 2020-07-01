@@ -17,7 +17,7 @@ namespace Pomelo.Protobuf
             if (protos == null) protos = new JsonObject();
 
             this.protos = (JsonObject)protos["nested"];
-            this.util = new Util();
+            util = new Util();
         }
 
         /// <summary>
@@ -32,7 +32,7 @@ namespace Pomelo.Protobuf
         public byte[] encode(string route, JsonObject msg)
         {
             byte[] returnByte = null;
-            JsonObject proto = this.util.GetProtoMessage(this.protos,route);
+            JsonObject proto = util.GetProtoMessage(protos, route);
             if (!(proto is null))
             {
                 int length = Encoder.byteLength(msg.ToString()) * 2;
@@ -56,7 +56,7 @@ namespace Pomelo.Protobuf
             ICollection<string> msgKeys = msg.Keys;
             foreach (string key in msgKeys)
             {
-                JsonObject protoField = this.util.GetField(proto, key);
+                JsonObject protoField = util.GetField(proto, key);
                 if (protoField is null)
                 {
                     continue;
@@ -81,8 +81,8 @@ namespace Pomelo.Protobuf
                     object valueType, valueId;
                     if (protoField.TryGetValue("type", out valueType) && protoField.TryGetValue("id", out valueId))
                     {
-                        offset = this.writeBytes(buffer, offset, this.encodeTag(valueType.ToString(), Convert.ToInt32(valueId)));
-                        offset = this.encodeProp(msg[key], valueType.ToString(), offset, buffer, proto);
+                        offset = writeBytes(buffer, offset, encodeTag(valueType.ToString(), Convert.ToInt32(valueId)));
+                        offset = encodeProp(msg[key], valueType.ToString(), offset, buffer, proto);
                     }
                 }
             }
@@ -97,21 +97,21 @@ namespace Pomelo.Protobuf
             object valueType, valueId;
             if (value.TryGetValue("type", out valueType) && value.TryGetValue("id", out valueId))
             {
-                if (this.util.isSimpleType(valueType.ToString()))
+                if (util.isSimpleType(valueType.ToString()))
                 {
-                    offset = this.writeBytes(buffer, offset, this.encodeTag(valueType.ToString(), Convert.ToInt32(valueId)));
-                    offset = this.writeBytes(buffer, offset, Encoder.encodeUInt32((uint)msg.Count));
+                    offset = writeBytes(buffer, offset, encodeTag(valueType.ToString(), Convert.ToInt32(valueId)));
+                    offset = writeBytes(buffer, offset, Encoder.encodeUInt32((uint)msg.Count));
                     foreach (object item in msg)
                     {
-                        offset = this.encodeProp(item, valueType.ToString(), offset, buffer, null);
+                        offset = encodeProp(item, valueType.ToString(), offset, buffer, null);
                     }
                 }
                 else
                 {
                     foreach (object item in msg)
                     {
-                        offset = this.writeBytes(buffer, offset, this.encodeTag(valueType.ToString(), Convert.ToInt32(valueId)));
-                        offset = this.encodeProp(item, valueType.ToString(), offset, buffer, proto);
+                        offset = writeBytes(buffer, offset, encodeTag(valueType.ToString(), Convert.ToInt32(valueId)));
+                        offset = encodeProp(item, valueType.ToString(), offset, buffer, proto);
                     }
                 }
             }
@@ -126,31 +126,38 @@ namespace Pomelo.Protobuf
             switch (type)
             {
                 case "uint32":
-                    this.writeUInt32(buffer, ref offset, value);
+                    writeUInt32(buffer, ref offset, value);
                     break;
                 case "int32":
                 case "sint32":
-                    this.writeInt32(buffer, ref offset, value);
+                    writeInt32(buffer, ref offset, value);
+                    break;
+                case "uint64":
+                    writeUInt64(buffer, ref offset, value);
+                    break;
+                case "int64":
+                case "sint64":
+                    writeInt64(buffer, ref offset, value);
                     break;
                 case "float":
-                    this.writeFloat(buffer, ref offset, value);
+                    writeFloat(buffer, ref offset, value);
                     break;
                 case "double":
-                    this.writeDouble(buffer, ref offset, value);
+                    writeDouble(buffer, ref offset, value);
                     break;
                 case "string":
-                    this.writeString(buffer, ref offset, value);
+                    writeString(buffer, ref offset, value);
                     break;
                 case "bool":
-                    this.writeBool(buffer, ref offset, value);
+                    writeBool(buffer, ref offset, value);
                     break;
                 default:
-                    JsonObject message = this.util.GetProtoMessage(this.protos, type);
+                    JsonObject message = util.GetProtoMessage(protos, type);
                     if (!(message is null))
                     {
                         byte[] tembuff = new byte[Encoder.byteLength(value.ToString()) * 3];
                         int length = 0;
-                        length = this.encodeMsg(tembuff, length, message, (JsonObject)value);
+                        length = encodeMsg(tembuff, length, message, (JsonObject)value);
                         offset = writeBytes(buffer, offset, Encoder.encodeUInt32((uint)length));
                         for (int i = 0; i < length; i++)
                         {
@@ -169,7 +176,7 @@ namespace Pomelo.Protobuf
             int le = Encoding.UTF8.GetByteCount(value.ToString());
             offset = writeBytes(buffer, offset, Encoder.encodeUInt32((uint)le));
             byte[] bytes = Encoding.UTF8.GetBytes(value.ToString());
-            this.writeBytes(buffer, offset, bytes);
+            writeBytes(buffer, offset, bytes);
             offset += le;
         }
 
@@ -183,7 +190,7 @@ namespace Pomelo.Protobuf
         //Encode float.
         private void writeFloat(byte[] buffer, ref int offset, object value)
         {
-            this.writeBytes(buffer, offset, Encoder.encodeFloat(float.Parse(value.ToString())));
+            writeBytes(buffer, offset, Encoder.encodeFloat(float.Parse(value.ToString())));
             offset += 4;
         }
 
@@ -204,6 +211,16 @@ namespace Pomelo.Protobuf
             offset = writeBytes(buffer, offset, Encoder.encodeSInt32(value.ToString()));
         }
 
+        private void writeUInt64(byte[] buffer, ref int offset, object value)
+        {
+            offset = writeBytes(buffer, offset, Encoder.encodeUInt64(value.ToString()));
+        }
+
+        private void writeInt64(byte[] buffer, ref int offset, object value)
+        {
+            offset = writeBytes(buffer, offset, Encoder.encodeSInt64(value.ToString()));
+        }
+
         //Write bytes to buffer.
         private int writeBytes(byte[] buffer, int offset, byte[] bytes)
         {
@@ -218,7 +235,7 @@ namespace Pomelo.Protobuf
         //Encode tag.
         private byte[] encodeTag(string type, int tag)
         {
-            int flag = this.util.containType(type);
+            int flag = util.containType(type);
             return Encoder.encodeUInt32((uint)(tag << 3 | flag));
         }
 

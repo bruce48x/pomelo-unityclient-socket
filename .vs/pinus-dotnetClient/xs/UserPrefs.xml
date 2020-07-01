@@ -16,7 +16,7 @@
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
-          <Node name="pomelo-dotnetClient" expanded="True" selected="True">
+          <Node name="pinus-dotnetClient" expanded="True">
             <Node name="clientTest" expanded="True">
               <Node name="json" expanded="True" />
               <Node name="test" expanded="True" />
@@ -25,10 +25,16 @@
               <Node name="src" expanded="True">
                 <Node name="protobuf" expanded="True">
                   <Node name="util" expanded="True" />
+                  <Node name="Encoder.cs" selected="True" />
                 </Node>
               </Node>
             </Node>
           </Node>
+        </State>
+      </Pad>
+      <Pad Id="MonoDevelop.UnitTesting.TestPad">
+        <State name="__root__">
+          <Node name="pinus-dotnetClient" expanded="True" selected="True" />
         </State>
       </Pad>
     </Pads>

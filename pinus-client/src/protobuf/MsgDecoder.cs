@@ -146,6 +146,11 @@ namespace Pomelo.Protobuf
                 case "int32":
                 case "sint32":
                     return Decoder.decodeSInt32(getBytes());
+                case "uint64":
+                    return Decoder.decodeUInt64(getBytes());
+                case "int64":
+                case "sint64":
+                    return Decoder.decodeSInt64(getBytes());
                 case "float":
                     return decodeFloat();
                 case "double":
