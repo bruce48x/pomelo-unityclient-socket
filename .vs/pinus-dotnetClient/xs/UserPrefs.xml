@@ -1,26 +1,31 @@
 ﻿<Properties StartupConfiguration="{140CA0FF-FE6E-4F25-BD62-ABE3E280A52B}|Default">
   <MonoDevelop.Ide.ItemProperties.clientTest PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="pinus-client/src/protobuf/Encoder.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="pinus-client/src/protocol/HandShakeService.cs">
     <Files>
       <File FileName="clientTest/clientTest.cs" Line="78" Column="62" />
       <File FileName="clientTest/test/ProtobufTest.cs" />
       <File FileName="pinus-client/src/client/PomeloClient.cs" />
       <File FileName="pinus-client/src/transport/Transporter.cs" />
-      <File FileName="clientTest/json/rootMsg.json" Line="14" Column="2" />
+      <File FileName="clientTest/json/rootMsg.json" />
       <File FileName="clientTest/json/rootProtos.json" />
-      <File FileName="pinus-client/src/protobuf/MsgDecoder.cs" Line="1" Column="1" />
-      <File FileName="pinus-client/src/protobuf/MsgEncoder.cs" Line="1" Column="1" />
-      <File FileName="pinus-client/src/protobuf/Encoder.cs" Line="79" Column="56" />
+      <File FileName="pinus-client/src/protobuf/MsgDecoder.cs" />
+      <File FileName="pinus-client/src/protobuf/MsgEncoder.cs" />
+      <File FileName="pinus-client/src/protobuf/Encoder.cs" />
+      <File FileName="clientTest/test/CodecTest.cs" />
+      <File FileName="clientTest/test/TransportTest.cs" />
+      <File FileName="pinus-client/src/protocol/HandShakeService.cs" Line="25" Column="54" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="pinus-dotnetClient" expanded="True">
+            <Node name="clientTest" expanded="True">
+              <Node name="test" expanded="True" />
+            </Node>
             <Node name="pinus-client" expanded="True">
               <Node name="src" expanded="True">
-                <Node name="protobuf" expanded="True">
-                  <Node name="Encoder.cs" selected="True" />
-                </Node>
+                <Node name="protobuf" expanded="True" />
+                <Node name="protocol" expanded="True" selected="True" />
               </Node>
             </Node>
           </Node>

@@ -1,5 +1,6 @@
 using System;
 using System.Text;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -22,7 +23,7 @@ namespace Pomelo.DotNetClient
 
         public void request(object user, Action<JObject> callback)
         {
-            byte[] body = Encoding.UTF8.GetBytes(buildMsg(user).ToString());
+            byte[] body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(buildMsg(user)));
 
             protocol.send(PackageType.PKG_HANDSHAKE, body);
 
