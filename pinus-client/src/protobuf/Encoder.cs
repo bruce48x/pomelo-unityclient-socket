@@ -40,7 +40,7 @@ namespace Pomelo.Protobuf
         {
             //uint num = (uint)(n < 0 ? (Math.Abs(n) * 2 - 1) : n * 2);
             var bArr = BitConverter.GetBytes((n << 1) ^ (n >> 31));
-            uint num = BitConverter.ToUInt32(bArr);
+            uint num = BitConverter.ToUInt32(bArr, 0);
             return encodeUInt32(num);
         }
 
@@ -76,7 +76,7 @@ namespace Pomelo.Protobuf
         {
             //ulong num = (ulong)(n < 0 ? (Math.Abs(n) * 2 - 1) : n * 2);
             var bArr = BitConverter.GetBytes((n << 1) ^ (n >> 63));
-            ulong num = BitConverter.ToUInt64(bArr);
+            ulong num = BitConverter.ToUInt64(bArr, 0);
             return encodeUInt64(num);
         }
 
