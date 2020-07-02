@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using SimpleJson;
+using Newtonsoft.Json.Linq;
 
 namespace Pomelo.Protobuf
 {
@@ -90,38 +90,38 @@ namespace Pomelo.Protobuf
             }
         }
 
-        public JsonObject GetProtoMessage(JsonObject proto, string name)
+        public JObject GetProtoMessage(JObject proto, string name)
         {
             if (proto is null)
             {
                 return null;
             }
 
-            object obj;
-            if (proto.TryGetValue(name, out obj))
+            var obj = proto[name];
+            if (obj is null)
             {
-                return (JsonObject)obj;
+                var nested = proto["nested"];
+                if (!(nested is null))
+                {
+                    return GetProtoMessage((JObject)nested, name);
+                }
             }
             else
             {
-                object nested;
-                if (proto.TryGetValue("nested", out nested))
-                {
-                    return GetProtoMessage((JsonObject)nested, name);
-                }
+                return (JObject)obj;
             }
             return null;
         }
 
-        public JsonObject GetField(JsonObject proto, string fieldName)
+        public JObject GetField(JObject proto, string fieldName)
         {
-            object protoFields;
-            if (proto.TryGetValue("fields", out protoFields))
+            var protoFields = proto["fields"];
+            if (!(protoFields is null))
             {
-                object protoField;
-                if (((JsonObject)protoFields).TryGetValue(fieldName, out protoField))
+                var protoField = protoFields[fieldName];
+                if (!(protoField is null))
                 {
-                    return (JsonObject)protoField;
+                    return (JObject)protoField;
                 }
             }
             return null;

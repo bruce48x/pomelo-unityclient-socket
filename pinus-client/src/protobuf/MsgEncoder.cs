@@ -1,6 +1,6 @@
 using System;
 using System.Text;
-using SimpleJson;
+using Newtonsoft.Json.Linq;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -8,15 +8,16 @@ namespace Pomelo.Protobuf
 {
     public class MsgEncoder
     {
-        private JsonObject protos { set; get; }//The message format(like .proto file)
+        private JObject protos { set; get; }//The message format(like .proto file)
         private Encoder encoder { set; get; }
         private Util util { set; get; }
 
-        public MsgEncoder(JsonObject protos)
+        public MsgEncoder(JObject protos)
         {
-            if (protos == null) protos = new JsonObject();
-
-            this.protos = (JsonObject)protos["nested"];
+            if (protos == null)
+                this.protos = new JObject();
+            else
+                this.protos = protos["nested"].ToObject<JObject>();
             util = new Util();
         }
 
@@ -29,10 +30,10 @@ namespace Pomelo.Protobuf
         /// <param name='msg'>
         /// Message.
         /// </param>
-        public byte[] encode(string route, JsonObject msg)
+        public byte[] encode(string route, JObject msg)
         {
             byte[] returnByte = null;
-            JsonObject proto = util.GetProtoMessage(protos, route);
+            JObject proto = util.GetProtoMessage(protos, route);
             if (!(proto is null))
             {
                 int length = Encoder.byteLength(msg.ToString()) * 2;
@@ -51,38 +52,41 @@ namespace Pomelo.Protobuf
         /// <summary>
         /// Encode the message.
         /// </summary>
-        private int encodeMsg(byte[] buffer, int offset, JsonObject proto, JsonObject msg)
+        private int encodeMsg(byte[] buffer, int offset, JObject proto, JObject msg)
         {
-            ICollection<string> msgKeys = msg.Keys;
-            foreach (string key in msgKeys)
+            var msgDict = msg.ToObject<Dictionary<string, object>>();
+            foreach (KeyValuePair<string, object> pair in msgDict)
             {
-                JsonObject protoField = util.GetField(proto, key);
+                var key = pair.Key;
+                JObject protoField = util.GetField(proto, key);
                 if (protoField is null)
                 {
                     continue;
                 }
-                object fieldRule;
-                if (protoField.TryGetValue("rule", out fieldRule))
+                var fieldRule = protoField["rule"];
+                if (fieldRule is null)
                 {
-                    if (fieldRule.ToString() == "repeated")
+                    var valueType = protoField["type"];
+                    var valueId = protoField["id"];
+                    if (!(valueType is null) && !(valueId is null))
                     {
-                        object arr;
-                        if (msg.TryGetValue(key, out arr))
-                        {
-                            if (((List<object>)arr).Count > 0)
-                            {
-                                offset = encodeArray((List<object>)arr, protoField, offset, buffer, proto);
-                            }
-                        }
+                        offset = writeBytes(buffer, offset, encodeTag(valueType.ToString(), Convert.ToInt32(valueId)));
+                        offset = encodeProp(msg[key], valueType.ToString(), offset, buffer, proto);
                     }
                 }
                 else
                 {
-                    object valueType, valueId;
-                    if (protoField.TryGetValue("type", out valueType) && protoField.TryGetValue("id", out valueId))
+                    if (fieldRule.ToString() == "repeated")
                     {
-                        offset = writeBytes(buffer, offset, encodeTag(valueType.ToString(), Convert.ToInt32(valueId)));
-                        offset = encodeProp(msg[key], valueType.ToString(), offset, buffer, proto);
+                        var arr = msg[key];
+                        if (!(arr is null))
+                        {
+                            var ls = arr.ToObject<List<object>>();
+                            if (ls.Count > 0)
+                            {
+                                offset = encodeArray(ls, protoField, offset, buffer, proto);
+                            }
+                        }
                     }
                 }
             }
@@ -92,10 +96,11 @@ namespace Pomelo.Protobuf
         /// <summary>
         /// Encode the array type.
         /// </summary>
-        private int encodeArray(List<object> msg, JsonObject value, int offset, byte[] buffer, JsonObject proto)
+        private int encodeArray(List<object> msg, JObject value, int offset, byte[] buffer, JObject proto)
         {
-            object valueType, valueId;
-            if (value.TryGetValue("type", out valueType) && value.TryGetValue("id", out valueId))
+            var valueType = value["type"];
+            var valueId = value["id"];
+            if (!(valueType is null) && !(valueId is null))
             {
                 if (util.isSimpleType(valueType.ToString()))
                 {
@@ -121,7 +126,7 @@ namespace Pomelo.Protobuf
         /// <summary>
         /// Encode each item in message.
         /// </summary>
-        private int encodeProp(object value, string type, int offset, byte[] buffer, JsonObject proto)
+        private int encodeProp(object value, string type, int offset, byte[] buffer, JObject proto)
         {
             switch (type)
             {
@@ -152,12 +157,12 @@ namespace Pomelo.Protobuf
                     writeBool(buffer, ref offset, value);
                     break;
                 default:
-                    JsonObject message = util.GetProtoMessage(protos, type);
+                    JObject message = util.GetProtoMessage(protos, type);
                     if (!(message is null))
                     {
                         byte[] tembuff = new byte[Encoder.byteLength(value.ToString()) * 3];
                         int length = 0;
-                        length = encodeMsg(tembuff, length, message, (JsonObject)value);
+                        length = encodeMsg(tembuff, length, message, (JObject)value);
                         offset = writeBytes(buffer, offset, Encoder.encodeUInt32((uint)length));
                         for (int i = 0; i < length; i++)
                         {

@@ -55,6 +55,10 @@
               "target": "Package",
               "version": "[16.5.0, )"
             },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[12.0.3, )"
+            },
             "coverlet.collector": {
               "target": "Package",
               "version": "[1.2.0, )"
@@ -113,6 +117,12 @@
       },
       "frameworks": {
         "netstandard2.1": {
+          "dependencies": {
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[12.0.3, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",

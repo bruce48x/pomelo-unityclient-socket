@@ -1,6 +1,6 @@
 using System;
 using System.Text;
-using SimpleJson;
+using Newtonsoft.Json.Linq;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -8,16 +8,16 @@ namespace Pomelo.Protobuf
 {
     public class MsgDecoder
     {
-        private JsonObject protos { set; get; }//The message format(like .proto file)
+        private JObject protos { set; get; }//The message format(like .proto file)
         private int offset { set; get; }
         private byte[] buffer { set; get; }//The binary message from server.
         private Util util { set; get; }
 
-        public MsgDecoder(JsonObject protos)
+        public MsgDecoder(JObject protos)
         {
-            if (protos == null) protos = new JsonObject();
+            if (protos == null) protos = new JObject();
 
-            this.protos = (JsonObject)protos["nested"];
+            this.protos = (JObject)protos["nested"];
             util = new Util();
         }
 
@@ -28,16 +28,16 @@ namespace Pomelo.Protobuf
         /// Route.
         /// </param>
         /// <param name='buf'>
-        /// JsonObject.
+        /// JObject.
         /// </param>
-        public JsonObject decode(string route, byte[] buf)
+        public JObject decode(string route, byte[] buf)
         {
             buffer = buf;
             offset = 0;
-            JsonObject proto = util.GetProtoMessage(protos, route);
+            JObject proto = util.GetProtoMessage(protos, route);
             if (!(proto is null))
             {
-                JsonObject msg = new JsonObject();
+                JObject msg = new JObject();
                 return decodeMsg(msg, proto, buffer.Length);
             }
             return null;
@@ -51,15 +51,15 @@ namespace Pomelo.Protobuf
         /// The message.
         /// </returns>
         /// <param name='msg'>
-        /// JsonObject.
+        /// JObject.
         /// </param>
         /// <param name='proto'>
-        /// JsonObject.
+        /// JObject.
         /// </param>
         /// <param name='length'>
         /// int.
         /// </param>
-        private JsonObject decodeMsg(JsonObject msg, JsonObject proto, int length)
+        private JObject decodeMsg(JObject msg, JObject proto, int length)
         {
             while (offset < length)
             {
@@ -67,49 +67,50 @@ namespace Pomelo.Protobuf
                 int id;
                 if (head.TryGetValue("id", out id))
                 {
-                    object fields = null;
-                    if (proto.TryGetValue("fields", out fields))
+                    var fields = proto["fields"];
+                    if (fields is null)
+                        continue;
+
+                    var fieldsDict = fields.ToObject<Dictionary<string, JObject>>();
+
+                    foreach (KeyValuePair<string, JObject> pair in fieldsDict)
                     {
-                        ICollection<string> keys = ((JsonObject)fields).Keys;
-                        foreach (string name in keys)
+                        var name = pair.Key;
+                        var field = pair.Value;
+
+                        var fieldId = field["id"];
+                        if (fieldId is null)
+                            continue;
+
+                        if (Convert.ToInt32(fieldId) == id)
                         {
-                            object field;
-                            if (((JsonObject)fields).TryGetValue(name, out field))
+                            var type = field["type"];
+                            if (type is null)
+                                continue;
+
+                            var rule = field["rule"];
+                            if (rule is null)
                             {
-                                object fieldId;
-                                if (((JsonObject)field).TryGetValue("id", out fieldId))
+                                msg.Add(name, new JValue(decodeProp(type.ToString(), proto)));
+                            }
+                            else
+                            {
+                                if (rule.ToString() == "repeated")
                                 {
-                                    if (Convert.ToInt32(fieldId) == id)
+                                    var msgVal = msg[name];
+                                    if (msgVal is null)
                                     {
-                                        object type;
-                                        if (((JsonObject)field).TryGetValue("type", out type))
-                                        {
-                                            object rule;
-                                            if (((JsonObject)field).TryGetValue("rule", out rule))
-                                            {
-                                                if (rule.ToString() == "repeated")
-                                                {
-                                                    object msgVal;
-                                                    if (msg.TryGetValue(name.ToString(), out msgVal))
-                                                    {
-                                                        decodeArray((List<object>)msgVal, type.ToString(), proto);
-                                                    }
-                                                    else
-                                                    {
-                                                        msg.Add(name.ToString(), new List<object>());
-                                                    }
-                                                }
-                                            }
-                                            else
-                                            {
-                                                msg.Add(name.ToString(), decodeProp(type.ToString(), proto));
-                                            }
-                                        }
+                                        msg.Add(name, new JValue(new List<object>()));
+                                    }
+                                    else
+                                    {
+                                        decodeArray(msgVal.ToObject<List<object>>(), type.ToString(), proto);
                                     }
                                 }
                             }
                         }
                     }
+
                 }
             }
             return msg;
@@ -118,7 +119,7 @@ namespace Pomelo.Protobuf
         /// <summary>
         /// Decode array in message.
         /// </summary>
-        private void decodeArray(List<object> list, string type, JsonObject proto)
+        private void decodeArray(List<object> list, string type, JObject proto)
         {
             if (util.isSimpleType(type))
             {
@@ -137,7 +138,7 @@ namespace Pomelo.Protobuf
         /// <summary>
         /// Decode each simple type in message.
         /// </summary>
-        private object decodeProp(string type, JsonObject proto)
+        private object decodeProp(string type, JObject proto)
         {
             switch (type)
             {
@@ -165,16 +166,16 @@ namespace Pomelo.Protobuf
         }
 
         //Decode the user-defined object type in message.
-        private JsonObject decodeObject(string type, JsonObject proto)
+        private JObject decodeObject(string type, JObject proto)
         {
             if (proto != null)
             {
-                JsonObject subProto = util.GetProtoMessage(proto, type);
+                JObject subProto = util.GetProtoMessage(proto, type);
                 int l = (int)Decoder.decodeUInt32(getBytes());
-                JsonObject msg = new JsonObject();
+                JObject msg = new JObject();
                 return decodeMsg(msg, subProto, offset + l);
             }
-            return new JsonObject();
+            return new JObject();
         }
 
         //Decode string type.

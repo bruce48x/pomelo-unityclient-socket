@@ -1,7 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using SimpleJson;
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 
 namespace Pomelo.DotNetClient.Test
 {
@@ -34,39 +34,6 @@ namespace Pomelo.DotNetClient.Test
         }
 
         [TestMethod]
-        public void TestZigZag()
-        {
-            int n;
-            byte[] barr;
-            uint ui;
-
-            n = -2;
-            barr = BitConverter.GetBytes((n << 1) ^ (n >> 31));
-            ui = BitConverter.ToUInt32(barr);
-            Assert.AreEqual(ui, 3u);
-
-            n = -1;
-            barr = BitConverter.GetBytes((n << 1) ^ (n >> 31));
-            ui = BitConverter.ToUInt32(barr);
-            Assert.AreEqual(ui, 1u);
-
-            n = 0;
-            barr = BitConverter.GetBytes((n << 1) ^ (n >> 31));
-            ui = BitConverter.ToUInt32(barr);
-            Assert.AreEqual(ui, 0u);
-
-            n = 1;
-            barr = BitConverter.GetBytes((n << 1) ^ (n >> 31));
-            ui = BitConverter.ToUInt32(barr);
-            Assert.AreEqual(ui, 2u);
-
-            n = 2;
-            barr = BitConverter.GetBytes((n << 1) ^ (n >> 31));
-            ui = BitConverter.ToUInt32(barr);
-            Assert.AreEqual(ui, 4u);
-        }
-
-        [TestMethod]
         public void TestEncode()
         {
             var uint32 = 112311u;
@@ -96,20 +63,21 @@ namespace Pomelo.DotNetClient.Test
         [TestMethod]
         public void TestProtobuf()
         {
-            JsonObject protos = ProtobufTest.read("../../../json/rootProtos.json");
-            JsonObject msgs = ProtobufTest.read("../../../json/rootMsg.json");
+            JObject protos = ProtobufTest.read("../../../json/rootProtos.json");
+            JObject msgs = ProtobufTest.read("../../../json/rootMsg.json");
 
             Pomelo.Protobuf.Protobuf protobuf = new Pomelo.Protobuf.Protobuf(protos, protos);
 
-            ICollection<string> keys = msgs.Keys;
+            var msgsDict = msgs.ToObject<Dictionary<string, JObject>>();
 
-            foreach (string key in keys)
+            foreach (KeyValuePair<string, JObject> pair in msgsDict)
             {
-                JsonObject msg = (JsonObject)msgs[key];
+                var key = pair.Key;
+                var msg = pair.Value;
                 byte[] bytes = protobuf.encode(key, msg);
-                Console.WriteLine("bytes" + bytes);
+                Console.WriteLine("bytes" + bytes.ToString());
                 Assert.IsNotNull(bytes);
-                JsonObject result = protobuf.decode(key, bytes);
+                JObject result = protobuf.decode(key, bytes);
                 Console.WriteLine("result =" + result);
                 Assert.IsNotNull(result);
                 Assert.IsTrue(ProtobufTest.equal(msg, result));

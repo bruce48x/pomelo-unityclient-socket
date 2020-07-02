@@ -1,34 +1,33 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using SimpleJson;
+using Newtonsoft.Json.Linq;
 using Pomelo.Protobuf;
 
 namespace Pomelo.DotNetClient.Test
 {
     public class ProtobufTest
     {
-        public static JsonObject read(string name)
+        public static JObject read(string name)
         {
             StreamReader file = new StreamReader(name);
 
             String str = file.ReadToEnd();
-
-            return (JsonObject)SimpleJson.SimpleJson.DeserializeObject(str);
+            return JObject.Parse(str);
         }
 
-        public static bool equal(JsonObject a, JsonObject b)
+        public static bool equal(JObject a, JObject b)
         {
-            ICollection<string> keys0 = a.Keys;
+            var aDict = a.ToObject<Dictionary<string, object>>();
 
-            foreach (string key in keys0)
+            foreach (KeyValuePair<string, object> pair in aDict)
             {
-                Console.WriteLine(a[key].GetType());
-                if (a[key].GetType().ToString() == "SimpleJson.JsonObject")
+                var key = pair.Key;
+                if (a[key].GetType().ToString() == "Newtonsoft.Json.Linq.JObject")
                 {
-                    if (!equal((JsonObject)a[key], (JsonObject)b[key])) return false;
+                    if (!equal((JObject)a[key], (JObject)b[key])) return false;
                 }
-                else if (a[key].GetType().ToString() == "SimpleJson.JsonArray")
+                else if (a[key].GetType().ToString() == "Newtonsoft.Json.Linq.JsonArray")
                 {
                     continue;
                 }

@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "9CHVRe2OtpA2PNf8kdpeeI4mqOmGSRh48Oztc8hRzUS9WrUi53woflaLWt4eVObtDoa/9GOTd1kLPxCgaY4hRg==",
+  "dgSpecHash": "9HyHh7fT2WtG78kooJZ65wLCas5dZiWMvuGyg0BF/oWUfmBVZLRGF0gEw40OqVrER0OFggqCvJS766YyTadoPA==",
   "success": true,
   "projectFilePath": "/Users/wangql/lworkspace/pinus-unityclient-socket/pinus-client/pinus-client.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "/Users/wangql/.nuget/packages/newtonsoft.json/12.0.3/newtonsoft.json.12.0.3.nupkg.sha512"
+  ],
   "logs": []
 }

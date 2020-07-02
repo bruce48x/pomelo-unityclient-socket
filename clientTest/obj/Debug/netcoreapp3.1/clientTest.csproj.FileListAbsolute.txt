@@ -85,7 +85,6 @@
 /Users/wangql/lworkspace/pinus-unityclient-socket/clientTest/bin/Debug/netcoreapp3.1/zh-Hant/Microsoft.TestPlatform.CrossPlatEngine.resources.dll
 /Users/wangql/lworkspace/pinus-unityclient-socket/clientTest/bin/Debug/netcoreapp3.1/zh-Hant/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
 /Users/wangql/lworkspace/pinus-unityclient-socket/clientTest/bin/Debug/netcoreapp3.1/pinus-client.dll
-/Users/wangql/lworkspace/pinus-unityclient-socket/clientTest/bin/Debug/netcoreapp3.1/SimpleJson.dll
 /Users/wangql/lworkspace/pinus-unityclient-socket/clientTest/bin/Debug/netcoreapp3.1/pinus-client.pdb
 /Users/wangql/lworkspace/pinus-unityclient-socket/clientTest/obj/Debug/netcoreapp3.1/clientTest.csprojAssemblyReference.cache
 /Users/wangql/lworkspace/pinus-unityclient-socket/clientTest/obj/Debug/netcoreapp3.1/clientTest.AssemblyInfoInputs.cache

@@ -1,7 +1,7 @@
 using Pomelo.DotNetClient;
 using System;
 using System.Collections.Generic;
-using SimpleJson;
+using Newtonsoft.Json.Linq;
 
 namespace Pomelo.DotNetClient.Test
 {
@@ -64,9 +64,9 @@ namespace Pomelo.DotNetClient.Test
 
         public static void protocolProcess(byte[] bytes)
         {
-            JsonObject dict = new JsonObject();
-            JsonObject serverProtos = new JsonObject();
-            JsonObject clientProtos = new JsonObject();
+            JObject dict = new JObject();
+            JObject serverProtos = new JObject();
+            JObject clientProtos = new JObject();
 
             MessageProtocol messageProtocol = new MessageProtocol(dict, serverProtos, clientProtos);
             Package pkg = PackageProtocol.decode(bytes);
