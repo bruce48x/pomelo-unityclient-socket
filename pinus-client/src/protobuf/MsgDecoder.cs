@@ -15,9 +15,10 @@ namespace Pomelo.Protobuf
 
         public MsgDecoder(JObject protos)
         {
-            if (protos == null) protos = new JObject();
-
-            this.protos = (JObject)protos["nested"];
+            if (protos == null)
+                this.protos = new JObject();
+            else
+                this.protos = protos;
             util = new Util();
         }
 
@@ -66,51 +67,51 @@ namespace Pomelo.Protobuf
                 Dictionary<string, int> head = getHead();
                 int id;
                 if (head.TryGetValue("id", out id))
+                    continue;
+
+
+                var fields = proto["fields"];
+                if (fields is null)
+                    continue;
+
+                var fieldsDict = fields.ToObject<Dictionary<string, JObject>>();
+
+                foreach (KeyValuePair<string, JObject> pair in fieldsDict)
                 {
-                    var fields = proto["fields"];
-                    if (fields is null)
+                    var name = pair.Key;
+                    var field = pair.Value;
+
+                    var fieldId = field["id"];
+                    if (fieldId is null)
                         continue;
 
-                    var fieldsDict = fields.ToObject<Dictionary<string, JObject>>();
-
-                    foreach (KeyValuePair<string, JObject> pair in fieldsDict)
+                    if (Convert.ToInt32(fieldId) == id)
                     {
-                        var name = pair.Key;
-                        var field = pair.Value;
-
-                        var fieldId = field["id"];
-                        if (fieldId is null)
+                        var type = field["type"];
+                        if (type is null)
                             continue;
 
-                        if (Convert.ToInt32(fieldId) == id)
+                        var rule = field["rule"];
+                        if (rule is null)
                         {
-                            var type = field["type"];
-                            if (type is null)
-                                continue;
-
-                            var rule = field["rule"];
-                            if (rule is null)
+                            msg.Add(name, new JValue(decodeProp(type.ToString(), proto)));
+                        }
+                        else
+                        {
+                            if (rule.ToString() == "repeated")
                             {
-                                msg.Add(name, new JValue(decodeProp(type.ToString(), proto)));
-                            }
-                            else
-                            {
-                                if (rule.ToString() == "repeated")
+                                var msgVal = msg[name];
+                                if (msgVal is null)
                                 {
-                                    var msgVal = msg[name];
-                                    if (msgVal is null)
-                                    {
-                                        msg.Add(name, new JValue(new List<object>()));
-                                    }
-                                    else
-                                    {
-                                        decodeArray(msgVal.ToObject<List<object>>(), type.ToString(), proto);
-                                    }
+                                    msg.Add(name, new JValue(new List<object>()));
+                                }
+                                else
+                                {
+                                    decodeArray(msgVal.ToObject<List<object>>(), type.ToString(), proto);
                                 }
                             }
                         }
                     }
-
                 }
             }
             return msg;

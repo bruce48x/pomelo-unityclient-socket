@@ -66,6 +66,7 @@ namespace Pomelo.DotNetClient.Test
             JObject protos = ProtobufTest.read("../../../json/rootProtos.json");
             JObject msgs = ProtobufTest.read("../../../json/rootMsg.json");
 
+            protos = protos["nested"].ToObject<JObject>();
             Pomelo.Protobuf.Protobuf protobuf = new Pomelo.Protobuf.Protobuf(protos, protos);
 
             var msgsDict = msgs.ToObject<Dictionary<string, JObject>>();
