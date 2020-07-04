@@ -4,6 +4,8 @@
 *.log
 *.userprefs
 *.pdb
+.vs
+.vscode
 
 # directories
 /pomelo-dotnetClient/obj
