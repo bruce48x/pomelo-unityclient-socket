@@ -1,0 +1,24 @@
+﻿syntax = "proto3";
+
+message Bar {
+    float fl = 1;
+}
+
+message Foo {
+    message Other {
+        uint32 a = 1;
+    }
+    bool like = 1;
+    float fl = 2;
+    double dbl = 3;
+    repeated double dblarr = 4;
+    int32 i32 = 5;
+    uint32 ui32 = 6;
+    sint32 si32 = 7;
+    int64 i64 = 8;
+    uint64 ui64 = 9;
+    sint64 si64 = 10;
+    string str = 11;
+    repeated Bar bar = 12;
+    Other oth =13;
+}

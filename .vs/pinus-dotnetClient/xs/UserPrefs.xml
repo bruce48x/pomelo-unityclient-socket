@@ -1,34 +1,31 @@
 ﻿<Properties StartupConfiguration="{140CA0FF-FE6E-4F25-BD62-ABE3E280A52B}|Default">
   <MonoDevelop.Ide.ItemProperties.clientTest PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="pinus-client/src/protobuf/Decoder.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="pinus-client/src/protobuf/MsgDecoder.cs">
     <Files>
-      <File FileName="clientTest/clientTest.cs" Line="69" Column="59" />
-      <File FileName="clientTest/test/ProtobufTest.cs" />
-      <File FileName="pinus-client/src/client/PomeloClient.cs" />
-      <File FileName="pinus-client/src/transport/Transporter.cs" />
-      <File FileName="clientTest/json/rootMsg.json" />
-      <File FileName="clientTest/json/rootProtos.json" />
-      <File FileName="pinus-client/src/protobuf/MsgDecoder.cs" Line="176" Column="45" />
-      <File FileName="pinus-client/src/protobuf/MsgEncoder.cs" Line="226" Column="63" />
-      <File FileName="pinus-client/src/protobuf/Encoder.cs" Line="44" Column="38" />
-      <File FileName="clientTest/test/CodecTest.cs" />
-      <File FileName="clientTest/test/TransportTest.cs" />
-      <File FileName="pinus-client/src/protocol/HandShakeService.cs" Line="1" Column="1" />
-      <File FileName="pinus-client/src/protocol/MessageProtocol.cs" Line="97" Column="36" />
-      <File FileName="pinus-client/src/protocol/Protocol.cs" Line="87" Column="17" />
-      <File FileName="pinus-client/src/protobuf/Protobuf.cs" Line="19" Column="32" />
-      <File FileName="pinus-client/src/protobuf/util/Util.cs" Line="93" Column="9" />
-      <File FileName="pinus-client/src/protobuf/Decoder.cs" Line="64" Column="14" />
+      <File FileName="pinus-client/src/protobuf/MsgEncoder.cs" Line="161" Column="31" />
+      <File FileName="clientTest/clientTest.cs" Line="1" Column="1" />
+      <File FileName="clientTest/test/ProtobufTest.cs" Line="15" Column="43" />
+      <File FileName="clientTest/proto/rootMsg.json" Line="20" Column="2" />
+      <File FileName="pinus-client/src/protobuf/util/Util.cs" Line="114" Column="14" />
+      <File FileName="pinus-client/src/protobuf/Encoder.cs" Line="83" Column="30" />
+      <File FileName="pinus-client/src/protobuf/MsgDecoder.cs" Line="138" Column="10" />
+      <File FileName="pinus-client/src/protobuf/Protobuf.cs" Line="24" Column="1" />
+      <File FileName="clientTest/proto/rootProtos.json" Line="1" Column="1" />
+      <File FileName="clientTest/proto/rootProtos.proto" Line="16" Column="21" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="pinus-dotnetClient" expanded="True">
+            <Node name="clientTest" expanded="True">
+              <Node name="proto" expanded="True" />
+              <Node name="test" expanded="True" />
+            </Node>
             <Node name="pinus-client" expanded="True">
               <Node name="src" expanded="True">
                 <Node name="protobuf" expanded="True">
                   <Node name="util" expanded="True" />
-                  <Node name="Decoder.cs" selected="True" />
+                  <Node name="MsgDecoder.cs" selected="True" />
                 </Node>
                 <Node name="protocol" expanded="True" />
               </Node>

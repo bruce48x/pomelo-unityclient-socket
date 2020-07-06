@@ -63,8 +63,8 @@ namespace Pomelo.DotNetClient.Test
         [TestMethod]
         public void TestProtobuf()
         {
-            JObject protos = ProtobufTest.read("../../../json/rootProtos.json");
-            JObject msgs = ProtobufTest.read("../../../json/rootMsg.json");
+            JObject protos = ProtobufTest.read("../../../proto/rootProtos.json");
+            JObject msgs = ProtobufTest.read("../../../proto/rootMsg.json");
 
             protos = protos["nested"].ToObject<JObject>();
             Pomelo.Protobuf.Protobuf protobuf = new Pomelo.Protobuf.Protobuf(protos, protos);
@@ -76,13 +76,38 @@ namespace Pomelo.DotNetClient.Test
                 var key = pair.Key;
                 var msg = pair.Value;
                 byte[] bytes = protobuf.encode(key, msg);
-                Console.WriteLine("bytes" + bytes.ToString());
+                Console.WriteLine("bytes = " + BitConverter.ToString(bytes).Replace("-", ""));
                 Assert.IsNotNull(bytes);
                 JObject result = protobuf.decode(key, bytes);
                 Console.WriteLine("result =" + result);
                 Assert.IsNotNull(result);
-                Assert.IsTrue(ProtobufTest.equal(msg, result));
+
+                Assert.IsTrue(equal(msg, result));
             }
+        }
+
+        public static bool equal(JObject a, JObject b)
+        {
+            var aDict = a.ToObject<Dictionary<string, object>>();
+
+            foreach (KeyValuePair<string, object> pair in aDict)
+            {
+                var key = pair.Key;
+                if (a[key].GetType().ToString() == "Newtonsoft.Json.Linq.JObject")
+                {
+                    if (!equal((JObject)a[key], (JObject)b[key])) return false;
+                }
+                else if (a[key].GetType().ToString() == "Newtonsoft.Json.Linq.JsonArray")
+                {
+                    continue;
+                }
+                else
+                {
+                    Assert.IsTrue(a[key].ToString().Equals(b[key].ToString()));
+                }
+            }
+
+            return true;
         }
     }
 }
