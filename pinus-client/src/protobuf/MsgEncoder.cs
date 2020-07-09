@@ -100,13 +100,17 @@ namespace Pomelo.Protobuf
             var valueId = protoField["id"];
             if (valueType != null && valueId != null)
             {
-                foreach (object item in msg)
+                if (util.isSimpleType(valueType.ToString()))
                 {
+                    // 简单类型，packed 编码
                     int length = Encoder.byteLength(msg.ToString()) * 2;
                     int subOffset = 0;
                     byte[] subBuff = new byte[length];
                     offset = writeBytes(buffer, offset, encodeTag("repeated", Convert.ToInt32(valueId)));
-                    subOffset = encodeProp(item, valueType.ToString(), subOffset, subBuff, true);
+                    foreach (object item in msg)
+                    {
+                        subOffset = encodeProp(item, valueType.ToString(), subOffset, subBuff, true);
+                    }
                     offset = writeBytes(buffer, offset, Encoder.encodeUInt32((uint)subOffset));
                     for (var i = 0; i < subOffset; i++)
                     {
@@ -114,6 +118,24 @@ namespace Pomelo.Protobuf
                     }
                     offset += subOffset;
                 }
+                else
+                {
+                    foreach (object item in msg)
+                    {
+                        int length = Encoder.byteLength(msg.ToString()) * 2;
+                        int subOffset = 0;
+                        byte[] subBuff = new byte[length];
+                        offset = writeBytes(buffer, offset, encodeTag("repeated", Convert.ToInt32(valueId)));
+                        subOffset = encodeProp(item, valueType.ToString(), subOffset, subBuff, true);
+                        offset = writeBytes(buffer, offset, Encoder.encodeUInt32((uint)subOffset));
+                        for (var i = 0; i < subOffset; i++)
+                        {
+                            buffer[offset + i] = subBuff[i];
+                        }
+                        offset += subOffset;
+                    }
+                }
+
             }
             return offset;
         }

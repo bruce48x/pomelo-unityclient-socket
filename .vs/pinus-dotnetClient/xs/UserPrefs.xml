@@ -2,8 +2,8 @@
   <MonoDevelop.Ide.ItemProperties.clientTest PreferredExecutionTarget="MonoDevelop.Default" />
   <MonoDevelop.Ide.Workbench ActiveDocument="pinus-client/src/protobuf/MsgEncoder.cs">
     <Files>
-      <File FileName="pinus-client/src/protobuf/MsgDecoder.cs" Line="126" Column="28" />
-      <File FileName="pinus-client/src/protobuf/MsgEncoder.cs" Line="84" Column="46" />
+      <File FileName="pinus-client/src/protobuf/MsgDecoder.cs" Line="72" Column="26" />
+      <File FileName="pinus-client/src/protobuf/MsgEncoder.cs" Line="135" Column="45" />
       <File FileName="clientTest/clientTest.cs" />
       <File FileName="clientTest/proto/rootMsg.json" />
     </Files>
