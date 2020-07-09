@@ -5,6 +5,11 @@
         "fl": {
           "type": "float",
           "id": 1
+        },
+        "ids": {
+          "rule": "repeated",
+          "type": "uint32",
+          "id": 2
         }
       }
     },

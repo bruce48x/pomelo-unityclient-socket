@@ -8,9 +8,8 @@ namespace Pomelo.Protobuf
 {
     public class MsgEncoder
     {
-        private JObject protos { set; get; }//The message format(like .proto file)
-        private Encoder encoder { set; get; }
-        private Util util { set; get; }
+        private JObject protos; //The message format(like .proto file)
+        private Util util;
 
         public MsgEncoder(JObject protos)
         {
@@ -34,7 +33,7 @@ namespace Pomelo.Protobuf
         {
             byte[] returnByte = null;
             JObject proto = util.GetProtoMessage(protos, route);
-            if (!(proto is null))
+            if (proto != null)
             {
                 int length = Encoder.byteLength(msg.ToString()) * 2;
                 int offset = 0;
@@ -54,16 +53,14 @@ namespace Pomelo.Protobuf
         /// </summary>
         private int encodeMsg(byte[] buffer, int offset, JObject proto, JObject msg)
         {
-            Console.WriteLine("encodeMsg proto = "+proto+", msg = "+msg);
             var msgDict = msg.ToObject<Dictionary<string, object>>();
             foreach (KeyValuePair<string, object> pair in msgDict)
             {
                 var key = pair.Key;
                 JObject protoField = util.GetField(proto, key);
                 if (protoField is null)
-                {
                     continue;
-                }
+
                 var fieldRule = protoField["rule"];
                 if (fieldRule is null)
                 {
@@ -72,7 +69,7 @@ namespace Pomelo.Protobuf
                     if (!(valueType is null) && !(valueId is null))
                     {
                         offset = writeBytes(buffer, offset, encodeTag(valueType.ToString(), Convert.ToInt32(valueId)));
-                        offset = encodeProp(msg[key], valueType.ToString(), offset, buffer, proto);
+                        offset = encodeProp(msg[key], valueType.ToString(), offset, buffer, false);
                     }
                 }
                 else
@@ -80,12 +77,12 @@ namespace Pomelo.Protobuf
                     if (fieldRule.ToString() == "repeated")
                     {
                         var arr = msg[key];
-                        if (!(arr is null))
+                        if (arr != null)
                         {
                             var ls = arr.ToObject<List<object>>();
                             if (ls.Count > 0)
                             {
-                                offset = encodeArray(ls, protoField, offset, buffer, proto);
+                                offset = encodeArray(ls, protoField, offset, buffer);
                             }
                         }
                     }
@@ -97,36 +94,26 @@ namespace Pomelo.Protobuf
         /// <summary>
         /// Encode the array type.
         /// </summary>
-        private int encodeArray(List<object> msg, JObject value, int offset, byte[] buffer, JObject proto)
+        private int encodeArray(List<object> msg, JObject protoField, int offset, byte[] buffer)
         {
-            var valueType = value["type"];
-            var valueId = value["id"];
-            if (!(valueType is null) && !(valueId is null))
+            var valueType = protoField["type"];
+            var valueId = protoField["id"];
+            if (valueType != null && valueId != null)
             {
-                int length = Encoder.byteLength(msg.ToString()) * 2;
-                int subOffset = 0;
-                byte[] subBuff = new byte[length];
-                offset = writeBytes(buffer, offset, encodeTag("repeated", Convert.ToInt32(valueId)));
-                if (util.isSimpleType(valueType.ToString()))
+                foreach (object item in msg)
                 {
-                    foreach (object item in msg)
+                    int length = Encoder.byteLength(msg.ToString()) * 2;
+                    int subOffset = 0;
+                    byte[] subBuff = new byte[length];
+                    offset = writeBytes(buffer, offset, encodeTag("repeated", Convert.ToInt32(valueId)));
+                    subOffset = encodeProp(item, valueType.ToString(), subOffset, subBuff, true);
+                    offset = writeBytes(buffer, offset, Encoder.encodeUInt32((uint)subOffset));
+                    for (var i = 0; i < subOffset; i++)
                     {
-                        subOffset = encodeProp(item, valueType.ToString(), subOffset, subBuff, null);
+                        buffer[offset + i] = subBuff[i];
                     }
+                    offset += subOffset;
                 }
-                else
-                {
-                    foreach (object item in msg)
-                    {
-                        subOffset = encodeProp(item, valueType.ToString(), subOffset, subBuff, proto);
-                    }
-                }
-                offset = writeBytes(buffer, offset, Encoder.encodeUInt32((uint)subOffset));
-                for (var i = 0; i < subOffset; i++)
-                {
-                    buffer[offset + i] = subBuff[i];
-                }
-                offset += subOffset;
             }
             return offset;
         }
@@ -134,7 +121,7 @@ namespace Pomelo.Protobuf
         /// <summary>
         /// Encode each item in message.
         /// </summary>
-        private int encodeProp(object value, string type, int offset, byte[] buffer, JObject proto)
+        private int encodeProp(object value, string type, int offset, byte[] buffer, bool inArray)
         {
             switch (type)
             {
@@ -165,24 +152,31 @@ namespace Pomelo.Protobuf
                     writeBool(buffer, ref offset, value);
                     break;
                 default:
-                    JObject message = util.GetProtoMessage(protos, type);
-                    Console.WriteLine("encodeProp type " + type + ", message " + message);
-                    if (!(message is null))
-                    {
-                        byte[] subBuff = new byte[Encoder.byteLength(value.ToString()) * 3];
-                        int subOffset = 0;
-                        subOffset = encodeMsg(subBuff, subOffset, message, (JObject)value);
-                        offset = writeBytes(buffer, offset, Encoder.encodeUInt32((uint)subOffset));
-                        for (int i = 0; i < subOffset; i++)
-                        {
-                            buffer[offset + i] = subBuff[i];
-                        }
-                        offset += subOffset;
-                    }
+                    encodeObject(type, value, ref offset, buffer, inArray);
                     break;
             }
-            Console.WriteLine("after encodeProp type = " + type + ", offset = " + offset);
             return offset;
+        }
+
+        private void encodeObject(string type, object msg, ref int offset, byte[] buffer, bool inArray)
+        {
+            JObject subProto = util.GetProtoMessage(protos, type);
+            if (subProto != null)
+            {
+                byte[] subBuff = new byte[Encoder.byteLength(msg.ToString())];
+                int subOffset = 0;
+                subOffset = encodeMsg(subBuff, subOffset, subProto, (JObject)msg);
+                if (!inArray)
+                {
+                    // 如果不在数组中则需要记录长度
+                    offset = writeBytes(buffer, offset, Encoder.encodeUInt32((uint)subOffset));
+                }
+                for (int i = 0; i < subOffset; i++)
+                {
+                    buffer[offset + i] = subBuff[i];
+                }
+                offset += subOffset;
+            }
         }
 
         //Encode string.
@@ -257,14 +251,14 @@ namespace Pomelo.Protobuf
 
         private void WriteRawLittleEndian64(byte[] buffer, int offset, ulong value)
         {
-            buffer[offset++] = ((byte)value);
-            buffer[offset++] = ((byte)(value >> 8));
-            buffer[offset++] = ((byte)(value >> 16));
-            buffer[offset++] = ((byte)(value >> 24));
-            buffer[offset++] = ((byte)(value >> 32));
-            buffer[offset++] = ((byte)(value >> 40));
-            buffer[offset++] = ((byte)(value >> 48));
-            buffer[offset++] = ((byte)(value >> 56));
+            buffer[offset++] = (byte)value;
+            buffer[offset++] = (byte)(value >> 8);
+            buffer[offset++] = (byte)(value >> 16);
+            buffer[offset++] = (byte)(value >> 24);
+            buffer[offset++] = (byte)(value >> 32);
+            buffer[offset++] = (byte)(value >> 40);
+            buffer[offset++] = (byte)(value >> 48);
+            buffer[offset++] = (byte)(value >> 56);
         }
     }
 }

@@ -1,17 +1,11 @@
 ﻿<Properties StartupConfiguration="{140CA0FF-FE6E-4F25-BD62-ABE3E280A52B}|Default">
   <MonoDevelop.Ide.ItemProperties.clientTest PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="pinus-client/src/protobuf/MsgDecoder.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="pinus-client/src/protobuf/MsgEncoder.cs">
     <Files>
-      <File FileName="pinus-client/src/protobuf/MsgEncoder.cs" Line="161" Column="31" />
-      <File FileName="clientTest/clientTest.cs" Line="1" Column="1" />
-      <File FileName="clientTest/test/ProtobufTest.cs" Line="15" Column="43" />
-      <File FileName="clientTest/proto/rootMsg.json" Line="20" Column="2" />
-      <File FileName="pinus-client/src/protobuf/util/Util.cs" Line="114" Column="14" />
-      <File FileName="pinus-client/src/protobuf/Encoder.cs" Line="83" Column="30" />
-      <File FileName="pinus-client/src/protobuf/MsgDecoder.cs" Line="138" Column="10" />
-      <File FileName="pinus-client/src/protobuf/Protobuf.cs" Line="24" Column="1" />
-      <File FileName="clientTest/proto/rootProtos.json" Line="1" Column="1" />
-      <File FileName="clientTest/proto/rootProtos.proto" Line="16" Column="21" />
+      <File FileName="pinus-client/src/protobuf/MsgDecoder.cs" Line="126" Column="28" />
+      <File FileName="pinus-client/src/protobuf/MsgEncoder.cs" Line="84" Column="46" />
+      <File FileName="clientTest/clientTest.cs" />
+      <File FileName="clientTest/proto/rootMsg.json" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -25,7 +19,7 @@
               <Node name="src" expanded="True">
                 <Node name="protobuf" expanded="True">
                   <Node name="util" expanded="True" />
-                  <Node name="MsgDecoder.cs" selected="True" />
+                  <Node name="MsgEncoder.cs" selected="True" />
                 </Node>
                 <Node name="protocol" expanded="True" />
               </Node>

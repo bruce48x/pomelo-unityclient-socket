@@ -8,10 +8,10 @@ namespace Pomelo.Protobuf
 {
     public class MsgDecoder
     {
-        private JObject protos { set; get; }//The message format(like .proto file)
-        private int offset { set; get; }
-        private byte[] buffer { set; get; }//The binary message from server.
-        private Util util { set; get; }
+        private JObject protos; //The message format(like .proto file)
+        private int offset;
+        private byte[] buffer;  //The binary message from server.
+        private Util util;
 
         public MsgDecoder(JObject protos)
         {
@@ -44,7 +44,6 @@ namespace Pomelo.Protobuf
                 if (!head.TryGetValue("id", out id))
                     continue;
 
-
                 var fields = proto["fields"];
                 if (fields is null)
                     continue;
@@ -69,7 +68,7 @@ namespace Pomelo.Protobuf
                         var rule = field["rule"];
                         if (rule is null)
                         {
-                            msg.Add(name, JToken.FromObject(decodeProp(type.ToString(), proto)));
+                            msg.Add(name, JToken.FromObject(decodeProp(type.ToString(), 0)));
                         }
                         else
                         {
@@ -81,36 +80,27 @@ namespace Pomelo.Protobuf
                                     msgVal = new JArray();
                                     msg.Add(name, msgVal);
                                 }
-                                decodeArray(msgVal, type.ToString(), proto);
+                                decodeArray(msgVal, type.ToString());
                             }
                         }
+                        break;
                     }
                 }
             }
             return msg;
         }
 
-        private void decodeArray(JArray list, string type, JObject proto)
+        private void decodeArray(JArray list, string type)
         {
             uint length = Decoder.decodeUInt32(getBytes());
             int curOffset = offset;
-            if (util.isSimpleType(type))
+            while (offset < curOffset + length)
             {
-                while (offset < curOffset + length)
-                {
-                    list.Add(decodeProp(type, null));
-                }
-            }
-            else
-            {
-                while (offset < curOffset + length)
-                {
-                    list.Add(decodeProp(type, proto));
-                }
+                list.Add(decodeProp(type, curOffset + Convert.ToInt32(length)));
             }
         }
 
-        private object decodeProp(string type, JObject proto)
+        private object decodeProp(string type, int len)
         {
             switch (type)
             {
@@ -133,21 +123,22 @@ namespace Pomelo.Protobuf
                 case "bool":
                     return decodeBool();
                 default:
-                    return decodeObject(type, protos);
+                    return decodeObject(type, protos, len);
             }
         }
 
         //Decode the user-defined object type in message.
-        private JObject decodeObject(string type, JObject proto)
+        private JObject decodeObject(string type, JObject proto, int len)
         {
-            if (proto != null)
-            {
-                JObject subProto = util.GetProtoMessage(proto, type);
-                int l = (int)Decoder.decodeUInt32(getBytes());
-                JObject msg = new JObject();
-                return decodeMsg(msg, subProto, offset + l);
-            }
-            return new JObject();
+            if (proto == null)
+                return new JObject();
+
+            if (len == 0)
+                len = offset + (int)Decoder.decodeUInt32(getBytes());
+
+            JObject subProto = util.GetProtoMessage(proto, type);
+            JObject msg = new JObject();
+            return decodeMsg(msg, subProto, len);
         }
 
         //Decode string type.

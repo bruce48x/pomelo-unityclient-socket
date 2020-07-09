@@ -2,6 +2,7 @@
 
 message Bar {
     float fl = 1;
+    repeated uint32 ids = 2;
 }
 
 message Foo {
